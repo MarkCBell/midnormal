@@ -20,7 +20,7 @@ def main():
     print("Angles for original mesh")
     print_angle_stats(original_mesh)
 
-    # Translate the input off file to the unit cube.
+    # Translate the original mesh inside the unit cube.
     # We save the scale and translation so we can move it back to it's original size later.
     unit_mesh, unscale, untranslate = normalise(original_mesh)
 

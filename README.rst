@@ -1,7 +1,7 @@
 Midnormal
 =========
 
-A script for refining a mesh of a surface using the `GradNormal algorithm of Hass--Trnkova <https://arxiv.org/abs/2001.09081>`_.
+A script for refining a mesh of a surface using the `GradNormal algorithm of Hass & Trnkova <https://arxiv.org/abs/2001.09081>`_.
 
 .. image:: images/before.png
    :scale: 75 %

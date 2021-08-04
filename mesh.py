@@ -18,7 +18,7 @@ def normalise(mesh):
     scale = (1 - 2 * PADDING) / max(i - j for i, j in zip(maxes, mins))
     translate = [-i * scale + PADDING for i in mins]
 
-    return affine(mesh, scale, translate), 1 / scale, [x - 2 * PADDING for x in mins]
+    return affine(mesh, scale, translate), 1 / scale, [x - PADDING / scale for x in mins]
 
 def affine(mesh, scale, translate):
     """Rescale and translate a mesh."""
@@ -28,13 +28,13 @@ def affine(mesh, scale, translate):
 
     return mesh
 
-def midnormal(NT, mesh):
+def midnormal(N, mesh):
     """Return the mesh obtained from middle normal disks."""
 
     # Using mesh.contains([P]) is incredibly slow.
     # So we will take advantage of the fact that our vertices are in vertical stacks.
 
-    dx = 1 / NT
+    dx = 1 / N
     dy = dx * sqrt(3) / 2
     dz = VERTICAL_SCALE * dx
 
