@@ -140,8 +140,6 @@ def midnormal(N, mesh):
 
     # Sort the heights above each point.
     for above in heights.values():
-        # Lines must intersect the surface an even number of times.
-        assert len(above) % 2 == 0
         above.sort()
 
     empty = 0  # Count the number of tetrahedra that don't contain any normal disks.
