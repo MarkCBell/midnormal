@@ -117,7 +117,9 @@ def midnormal(N, mesh):
                     V2 = (i + 1/2, j + 1 - j % 2)
                     V3 = (i - 1/2, j + 1 - j % 2)
 
-                    corner_heights = [(K - Nx * x * dx - Ny * y * dy) / Nz for x, y in [V0, V1, V2, V3]] if Nz else [-1, 1]
+                    # Get the height of the plane above each corner of the parallelogram
+                    # If the plane is absolutely vertical then use the entire vertical range [0, 1].
+                    corner_heights = [lattice_heights[i, j], lattice_heights[i + 1, j], lattice_heights[i, j + 1], lattice_heights[i + 1, j + 1]] if Nz else [0, 1]
                     corner_min, corner_max = max(min(corner_heights), z_min), min(max(corner_heights), z_max)
                     k_min, k_max = floor(corner_min / dz) - 4, floor(corner_max / dz) + 1
 
