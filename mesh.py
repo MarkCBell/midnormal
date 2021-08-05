@@ -104,9 +104,10 @@ def midnormal(N, mesh):
             # The next tetrahedra above starts one click around while tetrahedra in the adjacent stacks
             # spiral in the opposite directions.
 
-            # Note a bunch of conditionals are needed to handle the case when the plane is vertical and so Nz == 0.
+            # Unfortunately we need a bunch of conditionals to handle the case when the plane is vertical and so Nz == 0.
 
             if Nz:
+                # A dictionary mapping the (i, j) lattice point to the height of the plane above that point.
                 lattice_heights = dict(((i, j), (K - Nx * (i - (j % 2) / 2) * dx - Ny * j * dy) / Nz) for i in range(i_min, i_max + 2) for j in range(j_min, j_max + 2))
 
             for i in range(i_min, i_max + 1):
@@ -136,7 +137,7 @@ def midnormal(N, mesh):
                     if Nz:
                         x, y = (i - (j % 2) / 2) * dx, j * dy
                         if point_is_under_triangle(x, y, *triangle):
-                            heights[i - (j % 2) / 2, j].append((K - Nx * x - Ny * y) / Nz)
+                            heights[i - (j % 2) / 2, j].append(lattice_heights[i, j])
 
     # Sort the heights above each point.
     for above in heights.values():
