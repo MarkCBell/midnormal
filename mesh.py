@@ -53,11 +53,61 @@ def midnormal(N, mesh):
             i_min, i_max = floor(x_min / dx), floor(x_max / dx) + 2
             j_min, j_max = floor(y_min / dy), floor(y_max / dy) + 1
 
+            # Find the plane that contains this triangle.
             (Nx, Ny, Nz), K = spanning_plane(*triangle)
 
-            # Compute z coordinate where the vertical line above (x0, y0) meets the plane spanned by v0, v1, v2.
-            # Eqn of plane is then N . X == K
+            # To compute z coordinate where the vertical line above (x, y, 0) meets the plane, we use the fact that
+            # the plane is defined by N . X == K
             # So rearrange Nx * x0 + Ny * y0 + Nz * z == K, to solve for z.
+
+            # We use the standard triangulation of the xy-plane via equilateral triangles:
+            #  *-----*-----*
+            #   \   / \   / \
+            #    \ /   \ /   \
+            #     *-----*-----*
+            #    / \   / \   /
+            #   /   \ /   \ /
+            #  *---(i,j)---*
+            #   \   / \   / \
+            #    \ /   \ /   \
+            #     *-----*---- *
+
+            # Each lattice point determines a parallelogram (pair of triangles) with 4 vertices. On even rows it looks like this:
+            #  V3    V2
+            #  *-----*-----*
+            #   \ B / \   / \
+            #    \ / A \ /   \
+            #   (i,j)---*---- *
+            #     V0    V1
+            #
+            # while odd rows look like this:
+            #           V0    V1
+            #     *-----*-----*
+            #    / \   / \ A /
+            #   /   \ / B \ /
+            #  *---(i,j)---*
+            #        V3    V2
+
+            # Above each triangle, the vertices of the tetrahedra spiral around the three corners of the triangle:
+            #  -#-----------------#-->
+            #   |\    |\    |\    |\
+            #   | \   | \   | \   | \
+            #   |  \  |  \  |  \  |  \
+            #  -|-----|-----|---#-|----->
+            #   |  /  |  /  |  /  |  /
+            #   | /   | /   | /   | /
+            #   |/    |/    |/    |/
+            #  -------#-------------->
+            #
+            #  -------> z
+            #
+            # The next tetrahedra above starts one click around while tetrahedra in the adjacent stacks
+            # spiral in the opposite directions.
+
+            # Note a bunch of conditionals are needed to handle the case when the plane is vertical and so Nz == 0.
+
+            if Nz:
+                lattice_heights = dict(((i, j), (K - Nx * (i - (j % 2) / 2) * dx - Ny * j * dy) / Nz) for i in range(i_min, i_max + 2) for j in range(j_min, j_max + 2))
 
             for i in range(i_min, i_max + 1):
                 for j in range(j_min, j_max + 1):
@@ -71,9 +121,10 @@ def midnormal(N, mesh):
                     corner_min, corner_max = max(min(corner_heights), z_min), min(max(corner_heights), z_max)
                     k_min, k_max = floor(corner_min / dz) - 4, floor(corner_max / dz) + 1
 
-                    for V in [(V0, V1, V2), (V0, V3, V2)]:
+                    # Catalogue all the tetrahedra that occur in this vertical range.
+                    for V in [(V0, V1, V2), (V0, V3, V2)]:  # The A stack and the B stack.
                         for k in range(k_min, k_max):
-                            v0, v1, v2 = V[k % 3:] + V[:k % 3]
+                            v0, v1, v2 = V[k % 3], V[(k + 1) % 3], V[(k + 2) % 3]
                             A = (v0[0], v0[1], k + 0 + i % 3)
                             B = (v1[0], v1[1], k + 1 + i % 3)
                             C = (v2[0], v2[1], k + 2 + i % 3)
